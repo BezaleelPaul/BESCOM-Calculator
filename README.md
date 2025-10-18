@@ -5,7 +5,7 @@
 
 **Dynamic, interactive, and user-friendly web application to calculate your BESCOM electricity bill accurately.**
 
-![BESCOM BILL CALCULATOR](Bescom Bill calculator.PNG)
+![BESCOM BILL CALCULATOR](Bescom_Bill_calculator.PNG)
 
 ---
 
