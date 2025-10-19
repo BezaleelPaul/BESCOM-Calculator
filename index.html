@@ -1,65 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BESCOM Bill Calculator</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BESCOM Bill Calculator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <div class="container">
     <h1>BESCOM Bill Calculator</h1>
-    <p>Interactive, user-friendly, dynamic & free</p>
+    <p>Accurate, editable tariff settings + safety checks to avoid input mistakes</p>
   </div>
 </header>
 
 <main>
-  <div class="container card">
+  <div class="container">
+    <div class="card">
+      <label>Select Calculation Mode:</label>
+      <select id="mode" onchange="switchMode()">
+        <option value="kwh">Meter Reading (kWh)</option>
+        <option value="kvah">Meter Reading (kVAh)</option>
+        <option value="appliances">Appliance Estimation</option>
+      </select>
 
-    <label>Select Calculation Mode:</label>
-    <select id="mode" onchange="switchMode()">
-      <option value="kwh">Meter Reading (kWh)</option>
-      <option value="kvah">Meter Reading (kVAh)</option>
-      <option value="appliances">Appliance Estimation</option>
-    </select>
+      <div id="kwhInputs" class="mode-inputs">
+        <label>Previous Meter Reading (kWh):</label>
+        <input type="number" id="prev" placeholder="e.g. 4180">
+        <label>Current Meter Reading (kWh):</label>
+        <input type="number" id="curr" placeholder="e.g. 4500">
+        <div class="small-help">Tip: Make sure you select <strong>kWh</strong> if using meter readings printed on your bill.</div>
+      </div>
 
-    <div id="kwhInputs" class="mode-inputs">
-      <label>Previous Meter Reading (kWh):</label>
-      <input type="number" id="prev" placeholder="e.g. 3562">
-      <label>Current Meter Reading (kWh):</label>
-      <input type="number" id="curr" placeholder="e.g. 3720">
+      <div id="kvahInputs" class="mode-inputs" style="display:none;">
+        <label>kVAh Reading:</label>
+        <input type="number" id="kvah" placeholder="e.g. 300">
+        <label>Power Factor (PF, 0-1):</label>
+        <input type="number" id="pf" placeholder="e.g. 0.9" step="0.01" value="0.9">
+      </div>
+
+      <div id="appliancesInputs" class="mode-inputs" style="display:none;">
+        <div id="applianceList"></div>
+        <button type="button" onclick="addAppliance()" class="mini-btn">Add Appliance</button>
+        <div class="small-help">Add appliance wattage, hours/day and days used in the month.</div>
+      </div>
+
+      <label>Sanctioned Load (kW):</label>
+      <input type="number" id="sanc_load" value="5">
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Fixed Charge (₹ per kW):</label>
+          <input type="number" id="fixed" value="190">
+        </div>
+        <div style="flex:1; margin-left:12px;">
+          <label>Electricity Duty (%):</label>
+          <input type="number" id="duty" value="9">
+        </div>
+      </div>
+
+      <label>Energy Rate Mode:</label>
+      <select id="energy_mode" onchange="switchEnergyMode()">
+        <option value="flat">Flat rate (single ₹/unit)</option>
+        <option value="slab">Slab rates (0-50, 51-100, ...)</option>
+      </select>
+
+      <div id="flatRateBlock" style="margin-top:8px;">
+        <label>Flat unit rate (₹/unit):</label>
+        <input type="number" id="flat_rate" step="0.01" value="6.75">
+      </div>
+
+      <div id="slabRateBlock" style="display:none; margin-top:8px;">
+        <label>Slab rates (₹/unit) — editable:</label>
+        <div class="slab-row"><label>Slab 1 (0-50):</label><input id="slab1_rate" type="number" step="0.01"></div>
+        <div class="slab-row"><label>Slab 2 (51-100):</label><input id="slab2_rate" type="number" step="0.01"></div>
+        <div class="slab-row"><label>Slab 3 (101-200):</label><input id="slab3_rate" type="number" step="0.01"></div>
+        <div class="slab-row"><label>Slab 4 (201-300):</label><input id="slab4_rate" type="number" step="0.01"></div>
+        <div class="slab-row"><label>Slab 5 (301+):</label><input id="slab5_rate" type="number" step="0.01"></div>
+      </div>
+
+      <label>FPPCA rate (₹/unit):</label>
+      <input type="number" id="fppca_rate" step="0.01" value="0.36">
+
+      <label>P &amp; G Surcharge (₹/unit):</label>
+      <input type="number" id="pg_rate" step="0.01" value="0.36">
+
+      <label>Tax Base:</label>
+      <select id="tax_base">
+        <option value="energy">Tax on Energy Charges (as in your bill)</option>
+        <option value="subtotal">Tax on Subtotal (fixed + energy + surcharges)</option>
+        <option value="none">No tax</option>
+      </select>
+
+      <div class="row" style="margin-top:12px;">
+        <button onclick="calculateBill()" class="primary-btn">Calculate</button>
+        <button onclick="saveSettings()" class="secondary-btn">Save Settings</button>
+      </div>
+
+      <div id="debug" class="debug"></div>
+      <div id="result" class="result"></div>
     </div>
 
-    <div id="kvahInputs" class="mode-inputs" style="display:none;">
-      <label>kVAh Reading:</label>
-      <input type="number" id="kvah" placeholder="e.g. 300">
-      <label>Power Factor (PF, 0-1):</label>
-      <input type="number" id="pf" placeholder="e.g. 0.9" step="0.01" value="0.9">
+    <!-- Settings / Export card -->
+    <div class="card settings-card">
+      <h3>Tariff Settings (persisted in browser)</h3>
+      <p class="muted">Edit and Save. Use Export/Import to copy settings across devices.</p>
+
+      <div class="row">
+        <button onclick="exportSettings()" class="mini-btn">Export (JSON)</button>
+        <button onclick="importSettingsPrompt()" class="mini-btn">Import JSON</button>
+        <button onclick="resetSettings()" class="mini-btn">Reset Defaults</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label>Sanctioned load default (kW):</label>
+        <input id="sanc_default" type="number">
+        <label>Sanctioned-check threshold (% difference to warn):</label>
+        <input id="warn_threshold" type="number" step="1" value="30">
+        <div class="muted">If monthly units differ from your average by more than this %, the calculator asks you to confirm readings.</div>
+      </div>
     </div>
 
-    <div id="appliancesInputs" class="mode-inputs" style="display:none;">
-      <div id="applianceList"></div>
-      <button type="button" onclick="addAppliance()">Add Appliance</button>
+    <!-- History / last readings -->
+    <div class="card">
+      <h3>Meter History (saved locally)</h3>
+      <div id="historyList" class="muted"></div>
+      <div class="muted">The application stores readings locally to compute average consumption and warn on outliers.</div>
+      <div style="margin-top:8px;">
+        <button onclick="clearHistory()" class="mini-btn">Clear History</button>
+      </div>
     </div>
-
-    <label>Fixed Charge (₹):</label>
-    <input type="number" id="fixed" value="100">
-    <label>Electricity Duty (%):</label>
-    <input type="number" id="duty" value="9">
-
-    <button onclick="calculateBill()">Calculate</button>
-    <div class="result" id="result"></div>
-
   </div>
 </main>
 
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal" style="display:none">
+  <div class="modal-content">
+    <h4>Confirm unusual reading</h4>
+    <p id="confirmText"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button onclick="confirmProceed()" class="primary-btn small">Yes, proceed</button>
+      <button onclick="cancelProceed()" class="secondary-btn small">No, check inputs</button>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <p>Powered by BESCOM Bill Calculator | Free on GitHub Pages | Made By Bezaleel Paul</p>
+ <p style="text-align: center;">Powered by BESCOM Bill Calculator | run on GitHub Pages | By Bezaleel Paul</p>
+
 </footer>
 
+<textarea id="importArea" style="display:none"></textarea>
 <script src="script.js"></script>
 </body>
 </html>
-
