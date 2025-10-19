@@ -1,9 +1,7 @@
 
----
-
 # BESCOM Bill Calculator 🏠⚡
 
-**Dynamic, interactive, and user-friendly web application to calculate your BESCOM electricity bill accurately.**
+**Dynamic, interactive, and user-friendly web application to calculate your BESCOM electricity bill accurately, with full line-item breakdown and anomaly detection.**
 
 ![BESCOM BILL CALCULATOR](Bescom_Preview.png)
 
@@ -20,29 +18,36 @@ Check out the working website here:
 
 * **Multiple Calculation Modes:**
 
-  * **kWh Mode:** Calculate using meter readings.
+  * **kWh Mode:** Calculate using previous & current meter readings.
   * **kVAh Mode:** Convert kVAh readings to kWh using power factor.
   * **Appliance Estimation:** Estimate usage based on individual appliances (wattage × hours × days).
 
-* **Slab-wise Bill Breakdown:**
+* **Full Bill Breakdown:**
 
-  * Calculates energy charges for each BESCOM tariff slab.
-  * Includes fixed charges and electricity duty.
+  * **Fixed Charges:** Based on sanctioned load (kW).
+  * **Energy Charges:** Slab-wise calculation using BESCOM tariff.
+  * **FPPCA Charges:** Fuel & power purchase cost adjustment.
+  * **P & G Surcharge:** Government portion.
+  * **Taxes:** 9% electricity duty.
+  * **Additional Charges:** PF penalty, excess load/MD penalty, interest, debit/credit.
+  * **Current Demand & Net Payable:** Calculates total bill including arrears.
 
 * **Dynamic & Interactive:**
 
+  * Change any **unit rates, fixed charges, tax, or surcharge** dynamically.
   * Instant calculation without page reload.
-  * Clear display of results and slab-wise charges.
+  * Auto-updates totals when values change.
 
 * **Scam/Anomaly Detection:**
 
-  * Warns if units are unusually high.
+  * Alerts if units consumed are **unusually high or inconsistent with historical usage**.
   * Helps prevent errors due to incorrect meter readings.
 
-* **Modern UI:**
+* **Modern UI & UX:**
 
-  * Responsive, mobile-friendly design inspired by BESCOM’s look.
-  * Clean and intuitive interface for all users.
+  * Responsive and mobile-friendly design.
+  * Aesthetic inspired by BESCOM website with a clean, intuitive interface.
+  * Clear display of all charges and line items.
 
 * **Completely Free:**
 
@@ -53,16 +58,24 @@ Check out the working website here:
 
 ## 📊 Example Usage
 
-1. Select the calculation mode: **kWh**, **kVAh**, or **Appliance Estimation**.
-2. Enter your meter readings or appliance details.
-3. View:
+1. Select calculation mode: **kWh**, **kVAh**, or **Appliance Estimation**.
+
+2. Enter your meter readings, appliance data, or other parameters.
+
+3. Optionally, update:
+
+   * Fixed charges per kW
+   * Tariff slab rates
+   * FPPCA and P&G rates
+   * Tax percentage
+
+4. View:
 
    * Total units consumed
-   * Energy charges per slab
-   * Fixed charges
-   * Electricity duty
-   * Total bill
-   * Scam alert if applicable
+   * Fixed charges, energy charges, and additional charges
+   * Slab-wise breakdown
+   * Net payable amount
+   * Anomaly/scam alerts if usage is irregular
 
 ---
 
@@ -85,10 +98,9 @@ Check out the working website here:
 ## 🔹 Notes
 
 * Fully compliant with **BESCOM domestic tariff structure** (Bangalore, 2025).
-* Designed for **educational and personal use**.
+* Designed for **educational, personal use**, and **bill verification**.
+* Dynamic update feature ensures your calculator **remains accurate even if BESCOM updates tariffs**.
 
 ---
 
 
-
-Do you want me to do that?
